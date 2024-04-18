@@ -10,9 +10,10 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /bot ./cmd/bot
 
-FROM alpine
+FROM scratch
 
 COPY --from=0 /bot /bot
+COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ARG BOT_TOKEN
 ARG AQICN_TOKEN
