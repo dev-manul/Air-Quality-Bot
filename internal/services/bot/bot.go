@@ -39,7 +39,7 @@ func (b *Bot) Start() {
 - SO2: %0.2f
 - Ozone: %0.2f
 - Primary pollutant: %s
-- Humidity: %d
+- Humidity: %0.1f
 - Pressure:  %0.1fmb
 `,
 					data.Data.Aqi,

@@ -24,7 +24,7 @@ type Response struct {
 				V float64 `json:"v"`
 			} `json:"co"`
 			H struct {
-				V int `json:"v"`
+				V float64 `json:"v"`
 			} `json:"h"`
 			No2 struct {
 				V float64 `json:"v"`
@@ -45,7 +45,7 @@ type Response struct {
 				V float64 `json:"v"`
 			} `json:"so2"`
 			T struct {
-				V int `json:"v"`
+				V float64 `json:"v"`
 			} `json:"t"`
 			W struct {
 				V float64 `json:"v"`
