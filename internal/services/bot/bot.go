@@ -5,6 +5,8 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go.uber.org/zap"
+	"strings"
+	"time"
 )
 
 const (
@@ -30,17 +32,28 @@ func (b *Bot) Start() {
 			switch update.Message.Command() {
 			case commandStatus:
 				data := b.aqicn.Data()
+				forecast := []string{}
+				for _, value := range data.Data.Forecast.Daily.Pm25 {
+					day, err := time.Parse(value.Day, "2006-01-02")
+					if err != nil {
+						b.logger.Error("failed to parse date", zap.String("date", value.Day), zap.Error(err))
+					}
+					if day.After(time.Now()) {
+						forecast = append(forecast, fmt.Sprintf("%s: %d", value.Day, value.Avg))
+					}
+				}
 				msgText := fmt.Sprintf(`
 <b>Air Quality in Limassol [%d - %s]:</b>
-- PM2.5: %0.2f
-- PM10: %0.2f
-- NO2: %0.2f
-- CO: %0.2f
-- SO2: %0.2f
-- Ozone: %0.2f
+- PM2.5: %0.2f [Good < 50]
+- PM10: %0.2f [Good < 50 ]
+- NO2: %0.2f [Good < 50]
+- CO: %0.2f [Good < 50]
+- SO2: %0.2f [Good < 50]
+- Ozone: %0.2f [Good < 50 ]
 - Primary pollutant: %s
 - Humidity: %0.1f
-- Pressure:  %0.1fmb
+- Pressure:  %0.1fmb [Normal 1013.25mb]
+- Forecast for PM2.5: %s
 `,
 					data.Data.Aqi,
 					aqiValue(data.Data.Aqi),
@@ -53,6 +66,7 @@ func (b *Bot) Start() {
 					data.Data.Dominentpol,
 					data.Data.Iaqi.H.V,
 					data.Data.Iaqi.P.V,
+					strings.Join(forecast, ", "),
 				)
 
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, msgText)
