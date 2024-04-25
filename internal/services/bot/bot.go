@@ -39,21 +39,28 @@ func (b *Bot) Start() {
 						b.logger.Error("failed to parse date", zap.String("date", value.Day), zap.Error(err))
 					}
 					if day.Equal(time.Now().Truncate(24*time.Hour)) || day.After(time.Now()) {
-						forecast = append(forecast, fmt.Sprintf("%s - %d", day.Format("02 January"), value.Max))
+						forecast = append(forecast, fmt.Sprintf("<b>%s</b> - %d µg/m³", day.Format("02 January"), value.Max))
 					}
 				}
 				msgText := fmt.Sprintf(`
-<b>Air Quality in Limassol [%d - %s]:</b> 
-- PM2.5: %0.2f (Good less 50)
-- PM10: %0.2f (Good less 50)
-- NO2: %0.2f (Good less 50)
-- CO: %0.2f (Good less 50)
-- SO2: %0.2f (Good less 50)
-- Ozone: %0.2f (Good less 50)
-- Primary pollutant: %s
-- Humidity: %0.1f%%
-- Pressure:  %0.1fmb (Normal 1013.25mb)
-- Forecast for PM2.5: %s`,
+<b>Air Quality in Limassol: %d - %s</b>
+
+- <b>PM2.5</b>: %.2f µg/m³ (Good: less than 50 µg/m³)
+- <b>PM10</b>: %.2f µg/m³ (Good: less than 50 µg/m³)
+- <b>NO2</b>: %.2f µg/m³ (Good: less than 50 µg/m³)
+- <b>CO</b>: %.2f mg/m³ (Good: less than 50 mg/m³)
+- <b>SO2</b>: %.2f µg/m³ (Good: less than 50 µg/m³)
+- <b>Ozone</b>: %.2f µg/m³ (Good: less than 50 µg/m³)
+
+<b>Additional Information:</b>
+
+- <b>Primary Pollutant</b>: %s
+- <b>Humidity</b>: %.1f%%
+- <b>Pressure</b>: %.1f mb (Normal: 1013.25 mb)
+
+<b>PM2.5 Forecast</b>:
+
+%s`,
 					data.Data.Aqi,
 					aqiValue(data.Data.Aqi),
 					data.Data.Iaqi.Pm25.V,
@@ -65,7 +72,7 @@ func (b *Bot) Start() {
 					data.Data.Dominentpol,
 					data.Data.Iaqi.H.V,
 					data.Data.Iaqi.P.V,
-					strings.Join(forecast, ", "),
+					strings.Join(forecast, "\n"),
 				)
 
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, msgText)
